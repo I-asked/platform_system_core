@@ -19,7 +19,7 @@ import unittest
 def trace(cmd):
     """Print debug message if tracing enabled."""
     if False:
-        print >> sys.stderr, cmd
+        print(cmd, file=sys.stderr)
 
 
 def call(cmd_str):
@@ -380,7 +380,7 @@ class AdbFile(unittest.TestCase):
                     self.assertEqual(host_md5,
                                      temp_files[device_full_path].md5)
         finally:
-            for dev_file in temp_files.values():
+            for dev_file in list(temp_files.values()):
                 host_path = os.path.join(host_dir, dev_file.base_name)
                 os.remove(host_path)
             adb.shell_nocheck("rm -r {}".format(AdbFile.DEVICE_TEMP_DIR))
@@ -412,7 +412,7 @@ class AdbFile(unittest.TestCase):
             adb.sync("data")
 
             # confirm that every file on the device mirrors that on the host
-            for host_full_path in temp_files.keys():
+            for host_full_path in list(temp_files.keys()):
                 device_full_path = os.path.join(
                     AdbFile.DEVICE_TEMP_DIR,
                     temp_files[host_full_path].base_name)
@@ -423,7 +423,7 @@ class AdbFile(unittest.TestCase):
         finally:
             adb.shell_nocheck("rm -r {}".format(AdbFile.DEVICE_TEMP_DIR))
             if temp_files:
-                for tf in temp_files.values():
+                for tf in list(temp_files.values()):
                     tf.handle.close()
             if base_dir:
                 os.removedirs(base_dir + AdbFile.DEVICE_TEMP_DIR)
@@ -436,4 +436,4 @@ if __name__ == '__main__':
         suite = unittest.TestLoader().loadTestsFromName(__name__)
         unittest.TextTestRunner(verbosity=3).run(suite)
     else:
-        print "Test suite must be run with attached devices"
+        print("Test suite must be run with attached devices")
